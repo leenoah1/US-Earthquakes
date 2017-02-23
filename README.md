@@ -1,4 +1,4 @@
-# assignment2-771
-ges771 second assignment
+# assignment2-778
+GES 778 second assignment
 
 US Earthquakes
