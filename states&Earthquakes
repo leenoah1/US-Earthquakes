@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <h3><p><font size="6" color="crimson">Earthquake Map</font></p>
+  <title>class-04 Homework</title>
+
+<style>
+.line {
+  fill: none;
+  stroke; black
+  stroke-width: 1px;
+}
+rect {
+  fill: none;
+  stroke: black;
+  stroke-width: 1px;
+}
+path.quake, square.quake {
+  fill: white;
+  fill-opacity: 0.3;
+}
+path.counties, path.county-border {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .2;
+}
+path.state {
+  fill: none;
+  stroke: #000;
+}
+</style>
+    
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+
+<body>
+<script>
+  
+var width = 960, height = 500;
+var data;  // declare a global variable
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .on("mousemove", mousemoved);
+var layer = svg.append('g');
+var layer2 = svg.append('g');
+var info = d3.select("body").append("div")
+    .attr("class", "info");
+var projection = d3.geoAlbersUsa();
+var path = d3.geoPath()
+    .projection(projection);
+  
+var pathQuake = d3.geoPath()
+    .pointRadius(5)
+    .projection(projection);
+var usgs = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
+  d3.json(usgs, plotQuakes);  
+  function plotQuakes(error, data) {
+  if (error) console.log(error);
+  
+  // Filter the small earthquakes
+  var features = data.features;
+  // Plot the earthquakes
+  layer2.selectAll("path.quake")
+      .data(features)
+    .enter().append("path")
+      .attr("class", "quake")
+  .style('fill','crimson')
+      .attr("d", path)
+}
+
+// Read and plot the earthquake data
+var url = "https://umbcvis.github.io/classes/class-03/us.json"
+
+d3.json(url, plotStates);
+function plotStates(error, json) {
+  // Create array of GeoJSON features -- this defines the global variable "data"
+  data = json.objects.us.geometries.map(function(d) { return topojson.feature(json, d); })
+  // Put your code here
+  // Plot the features
+  layer.selectAll("path")
+      .data(data)
+    .enter()
+      .append("path")
+      .attr("d", path);
+}
+function mousemoved() {
+  info.text(formatLocation(projection.invert(d3.mouse(this)), projection.scale()));
+}
+function formatLocation(p, k) {
+  var format = d3.format("." + Math.floor(Math.log(k) / 2 - 2) + "f");
+  return (p[1] < 0 ? format(-p[1]) + "°S" : format(p[1]) + "°N") + " "
+       + (p[0] < 0 ? format(-p[0]) + "°W" : format(p[0]) + "°E");
+}
+  </script>
+ 
+ <style>
+ var d3 = require('d3');
+var d3legend = require('d3-legend')(d3);
+.attr("data-legend",function(d) { return d.name})
+legend = svg.append("g")
+  .attr("class","legend")
+  .attr("transform","translate(50,30)")
+  .style("font-size","12px")
+  .call(d3.legend);
+  </style>
+ 
+</body>
+</html>
